@@ -43,8 +43,10 @@ func main() {
 
 func initDB() {
 	connStr := os.Getenv("DB_CONNECTION_STRING")
+	log.Printf("DB_CONNECTION_STRING: %s", connStr)
 	if connStr == "" {
 		connStr = "postgres://postgres:postgres@localhost/cinemaabyss?sslmode=disable"
+		log.Printf("connStr: %s", connStr)
 	}
 
 	var err error
