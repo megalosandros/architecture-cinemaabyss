@@ -1,0 +1,71 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+' Система
+System_Boundary(c1, "Кинобездна") {
+  Container(api_gateway, "API Gateway", "Go", "Единая точка входа. Роутинг, аутентификация, rate limiting.")
+  
+  Container(user_service, "Сервис пользователей", "Go", "Управление аккаунтами, сессиями, профилями.")
+  ContainerDb(user_db, "БД пользователей", "PostgreSQL", "Хранение данных пользователей.")
+
+  Container(subscription_service, "Сервис подписок и платежей", "Go", "Тарифы, оплата, скидки, интеграция с платёжными системами.")
+  ContainerDb(subscription_db, "БД подписок", "PostgreSQL", "Данные о подписках, транзакциях, скидках.")
+
+  Container(movies_service, "Сервис фильмов", "Go", "Фильмы, жанры, актёры, рейтинги, избранное.")
+  ContainerDb(movies_db, "База данных фильмов", "PostgreSQL", "Метаданные контента.")
+
+  Container(viewing_service, "Сервис просмотра", "Go", "История просмотров, прогресс воспроизведения.")
+  ContainerDb(viewing_db, "БД просмотров", "PostgreSQL", "Данные о сессиях просмотра.")
+
+  Container(recommendation_adapter, "Адаптер рекомендаций", "Go", "Интеграция со сторонней рекомендательной системой через Kafka.")
+  
+  Container(integration_service, "Сервис интеграций", "Go", "Обмен данными с маркетплейсами и программами лояльности.")
+  
+  ContainerQueue(kafka, "Kafka", "Apache Kafka", "Асинхронная шина событий: оценки, просмотры, события для рекомендаций.")
+}
+
+' Внешние системы
+Person(user, "Пользователь", "Смотрит контент через мобильные, веб или Smart TV.")
+
+System_Ext(external_payment, "Платёжные системы", "Stripe, PayPal и др.")
+System_Ext(external_recommendation, "Рекомендательная система", "Сторонний ML-сервис")
+System_Ext(external_loyalty, "Сервисы лояльности", "Программы лояльности партнёров")
+System_Ext(external_marketplace, "Маркетплейсы", "Партнёрские площадки")
+
+' Связи
+Rel(user, api_gateway, "HTTP/HTTPS", "Использует разные интерфейсы")
+
+Rel(api_gateway, user_service, "HTTP", "Аутентификация, профиль")
+Rel(api_gateway, movies_service, "HTTP", "Получение метаданных, избранное")
+Rel(api_gateway, subscription_service, "HTTP", "Управление подпиской")
+Rel(api_gateway, viewing_service, "HTTP", "История, прогресс")
+Rel(api_gateway, integration_service, "HTTP", "Действия в маркетплейсах")
+
+Rel(user_service, user_db, "Чтение/запись")
+Rel(subscription_service, subscription_db, "Чтение/запись")
+Rel(movies_service, movies_db, "Чтение/запись")
+Rel(viewing_service, viewing_db, "Чтение/запись")
+
+Rel(movies_service, kafka, "Публикует", "События: оценка фильма, добавление в избранное")
+Rel(viewing_service, kafka, "Публикует", "События: начало/окончание просмотра")
+Rel(recommendation_adapter, kafka, "Подписывается", "Потребляет события для отправки в рекомендательную систему")
+Rel(recommendation_adapter, external_recommendation, "gRPC/HTTP", "Передача данных")
+
+Rel(subscription_service, external_payment, "HTTP", "Обработка платежей")
+Rel(integration_service, external_loyalty, "HTTP", "Начисление бонусов")
+Rel(integration_service, external_marketplace, "HTTP", "Совместные акции")
+
+' Kubernetes как платформа
+System_Boundary(k8s, "Kubernetes (Helm-managed)") {
+  ' Все микросервисы, базы данных и Kafka
+  ' развернуты в Kubernetes с использованием Helm-чартов.
+  ' Это логическая группировка — в PlantUML нельзя вложить контейнеры в System_Boundary,
+  ' поэтому просто укажем примечание
+}
+note right of c1
+  Все микросервисы, базы данных и Kafka
+  развернуты в Kubernetes с использованием Helm-чартов.
+  Базы данных могут быть в StatefulSets или внешними managed-сервисами.
+end note
+
+@enduml
