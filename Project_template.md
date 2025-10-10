@@ -302,9 +302,9 @@ https://cinemaabyss.example.com/api/movies
 
 ## Скриншоты задания 4  
 *Скриншот развертывания Helm*  
-![Скриншот развертывания](screenshots/task3_postman-tests-result.png)  
+![Скриншот развертывания](screenshots/task4_helm_deploy.png)  
 *Вывод api/movies*  
-![Вывод api/movies](screenshots/task3_events_service_logs.png)  
+![Вывод api/movies](screenshots/task4_cinemaabyss_api_movies.png)  
 
 
 ## Удаляем все
