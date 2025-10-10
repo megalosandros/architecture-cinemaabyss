@@ -213,7 +213,16 @@ cat .docker/config.json | base64
   Откройте логи event-service и сделайте скриншот обработки событий
 
 #### Шаг 3
-Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.
+Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.  
+
+*Результат вызова тестов*  
+![Запуск тестов](screenshots/task3_postman-tests-result.png)  
+*Логи event-service*  
+![Логи обработки событий](screenshots/task3_events_service_logs.png)  
+*Вызов api/movies*  
+![Вызов api/movies](screenshots/task3_cinemaabyss_api_movies.png)  
+
+
 
 
 # Задание 4
